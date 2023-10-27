@@ -51,13 +51,15 @@ namespace FDS.Services
             return null;
         }
 
-        public void Update(User User)
+        public void Update(User User, Guid id)
         {
-            var _User = _context.Users.SingleOrDefault(a => a.UserID == User.UserID);
+            var _User = _context.Users.SingleOrDefault(a => a.UserID == id);
             if (_User != null)
             {
+                _User.UserID= id;
                 _User.UserName = User.UserName;
                 _User.Password = User.Password;
+                _User.Name = User.Name;
                 _User.age = User.age;
                 _User.gender = User.gender;
 

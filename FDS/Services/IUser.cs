@@ -7,7 +7,7 @@ namespace FDS.Services
         List<User> GetAll();
         User GetById(Guid id);
         User Add(User user);
-        void Update(User User);
+        void Update(User User, Guid id);
         void Delete(Guid id);
     }
 }

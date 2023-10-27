@@ -58,7 +58,7 @@ namespace FDS.Controllers
                 var _user = _userRepository.GetById(Guid.Parse(id));
                 if (_user != null)
                 {
-                    _userRepository.Update(user);
+                    _userRepository.Update(user, Guid.Parse(id));
                     return Ok();
                 }
                 else
