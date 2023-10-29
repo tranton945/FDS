@@ -15,7 +15,7 @@ builder.Services.AddDbContext<FDSDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddScoped<IUser, UserRepository>();
-
+builder.Services.AddScoped<Roles>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 builder.Services.AddControllers();
