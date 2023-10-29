@@ -1,5 +1,6 @@
 ﻿using FDS.Data;
 using FDS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace FDS.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll() 
         {
             try
@@ -30,6 +32,7 @@ namespace FDS.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetById(string id)
         {
             try
@@ -51,6 +54,7 @@ namespace FDS.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Update(string id, User user)
         {
             try
@@ -73,6 +77,7 @@ namespace FDS.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(string id)
         {
             try
@@ -95,6 +100,7 @@ namespace FDS.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Create(User user)
         {
             try

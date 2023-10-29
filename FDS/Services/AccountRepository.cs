@@ -24,6 +24,13 @@ namespace FDS.Services
 
         public async Task<string> SignInAsync(SignInModel model)
         {
+
+            if (!model.Email.EndsWith("@vietjetair.com"))
+            {
+                // Trả về null nếu tài khoản email không đáp ứng yêu cầu
+                return null;
+            }
+
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
             
             // login fail
@@ -35,8 +42,8 @@ namespace FDS.Services
             {
                 new Claim(ClaimTypes.Email, model.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, "Admin"), 
-                new Claim(ClaimTypes.Role, "Manager"),
+                //new Claim(ClaimTypes.Role, "Admin"), 
+                //new Claim(ClaimTypes.Role, "Manager"),
             };
 
             var authenkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -54,6 +61,13 @@ namespace FDS.Services
 
         public async Task<IdentityResult> SignUpAsync(SignUpModel model)
         {
+
+            if (!model.Email.EndsWith("@vietjetair.com"))
+            {
+                // Trả về lỗi nếu tài khoản email không đáp ứng yêu cầu
+                return IdentityResult.Failed(new IdentityError { Description = "Only @vietjetair.com email addresses are allowed to register." });
+
+            }
             var user = new ApplicationUser
             {
                 Name = model.Name,
