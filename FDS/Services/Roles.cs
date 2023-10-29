@@ -8,12 +8,10 @@ namespace FDS.Services
     public class Roles
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly FDSDbContext _context;
 
-        public Roles(RoleManager<IdentityRole> roleManager, FDSDbContext context) 
+        public Roles(RoleManager<IdentityRole> roleManager) 
         {
             _roleManager = roleManager;
-            _context = context;
         }
 
         public async Task<IdentityResult> AddRole(string roleName)
