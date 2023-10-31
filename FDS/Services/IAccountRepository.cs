@@ -1,4 +1,5 @@
-﻿using FDS.Models;
+﻿using FDS.Data;
+using FDS.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace FDS.Services
@@ -8,5 +9,10 @@ namespace FDS.Services
         public Task<IdentityResult> SignUpAsync(SignUpModel model);
 
         public Task<string> SignInAsync(SignInModel model);
+
+        public Task<bool> SignOut();
+
+        public Task<List<ApplicationUser>> GetAllAccounts();
+
     }
 }

@@ -1,5 +1,8 @@
 ﻿using FDS.Models;
 using FDS.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,6 +39,22 @@ namespace FDS.Controllers
                 return Unauthorized();
             }
             return Ok(result);  
+        }
+
+        [HttpPost("SignOut")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var result = await _account.SignOut();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllAccounts()
+        {
+            var result = await _account.GetAllAccounts();
+            return Ok(result);
         }
     }
 }

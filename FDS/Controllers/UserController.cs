@@ -18,7 +18,8 @@ namespace FDS.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAll() 
         {
             try
