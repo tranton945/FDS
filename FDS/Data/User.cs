@@ -20,6 +20,7 @@ namespace FDS.Data
         //public string DateOfBirt { get; set; }
         public byte age { get; set; }
         public string gender { get; set; }
+        public static object Identity { get; internal set; }
 
         public User()
         {

@@ -1,6 +1,7 @@
 ﻿using FDS.Data;
 using FDS.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -114,6 +115,106 @@ namespace FDS.Services
         {
             var accounts = await _userManager.Users.ToListAsync();
             return accounts;
+        }
+
+        public async Task<ApplicationUser> GetAccountsByEmail(string email)
+        {
+            if (!email.EndsWith("@vietjetair.com"))
+            {
+                return null;
+            }
+            var accounts = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (accounts == null)
+            {
+                return null;
+            }
+            return accounts;
+        }
+
+        public async Task<bool> UpdateAccount(string email, string newName, DateTime newDateOfBirt, string newGender)
+        {
+            if (!email.EndsWith("@vietjetair.com"))
+            {
+                return false;
+            }
+            var accounts = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (accounts == null)
+            {
+                return false;
+            }
+            var oldName = accounts.Name;
+            var oldDateOfBirt = accounts.DateOfBirt;
+            var oldGender = accounts.Gender;
+
+
+            accounts.Name = newName;
+            accounts.DateOfBirt = newDateOfBirt;
+            accounts.Gender = newGender;
+
+            var result = await _userManager.UpdateAsync(accounts);
+
+            if (result.Succeeded)
+            {
+                // Xóa bộ nhớ đệm để tránh trường hợp data cũ vẫn được sử dụng
+                await _userManager.UpdateSecurityStampAsync(accounts);
+
+                return true;
+            }
+            else
+            {
+                // Khôi phục lại data cũ nếu cập nhật không thành công
+                accounts.Name = newName;
+                accounts.DateOfBirt = newDateOfBirt;
+                accounts.Gender = newGender;
+
+                return false;
+            }
+
+        }
+
+        public async Task<bool> DeleteAccount(string email)
+        {
+            var accounts = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if(accounts == null)
+            { 
+                return false; 
+            }
+
+            var result = await _userManager.DeleteAsync(accounts);
+
+            if (result.Succeeded)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdatePassword(ChangePasswordModel model)
+        {
+            var account = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if(account == null) 
+            { 
+                return false; 
+            }
+            if(model.NewPassword != model.ConfirmPassword)
+            {
+                return false;
+            }
+            // tạo một token để đặt lại mật khẩu
+            var token = await _userManager.GeneratePasswordResetTokenAsync(account);
+            var result = await _userManager.ResetPasswordAsync(account, token, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }
