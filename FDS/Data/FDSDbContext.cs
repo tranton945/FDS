@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FDS.Data
@@ -10,7 +11,9 @@ namespace FDS.Data
 
 
         public DbSet<User> Users { get; set; }
-
+        public DbSet<Flight> Flights { get; set; }
+        public DbSet<Document> Documents { get; set; }
+        public DbSet<OldDocVer> OldDocVers { get; set; }
 
     }
 }

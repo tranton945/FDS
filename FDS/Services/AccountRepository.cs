@@ -48,8 +48,6 @@ namespace FDS.Services
             {
                 new Claim(ClaimTypes.Email, model.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                //new Claim(ClaimTypes.Role, "Admin"), 
-                //new Claim(ClaimTypes.Role, "Manager"),
             };
             
             var listUserRoles = await GetRolesOfUser(model.Email);

@@ -4,6 +4,7 @@ using FDS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FDS.Migrations
 {
     [DbContext(typeof(FDSDbContext))]
-    partial class FDSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231102044343_addDocAndFlight")]
+    partial class addDocAndFlight
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +116,7 @@ namespace FDS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FlightId")
+                    b.Property<int>("FlightId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -126,6 +128,7 @@ namespace FDS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Signature")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime>("UpdateDate")
@@ -173,48 +176,6 @@ namespace FDS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Flight");
-                });
-
-            modelBuilder.Entity("FDS.Data.OldDocVer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Creator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DocId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Signature")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<float>("Version")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocId");
-
-                    b.ToTable("OldDocVer");
                 });
 
             modelBuilder.Entity("FDS.Data.User", b =>
@@ -384,20 +345,11 @@ namespace FDS.Migrations
                 {
                     b.HasOne("FDS.Data.Flight", "Flight")
                         .WithMany("Documents")
-                        .HasForeignKey("FlightId");
-
-                    b.Navigation("Flight");
-                });
-
-            modelBuilder.Entity("FDS.Data.OldDocVer", b =>
-                {
-                    b.HasOne("FDS.Data.Document", "Doc")
-                        .WithMany("OldDocVers")
-                        .HasForeignKey("DocId")
+                        .HasForeignKey("FlightId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Doc");
+                    b.Navigation("Flight");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -449,11 +401,6 @@ namespace FDS.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FDS.Data.Document", b =>
-                {
-                    b.Navigation("OldDocVers");
                 });
 
             modelBuilder.Entity("FDS.Data.Flight", b =>
