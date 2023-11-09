@@ -14,6 +14,8 @@ namespace FDS.Data
         public DbSet<Flight> Flights { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<OldDocVer> OldDocVers { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<UserDTO> UserDTOs { get; set; }
 
     }
 }

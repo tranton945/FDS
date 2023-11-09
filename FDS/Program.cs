@@ -23,6 +23,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IFlight, FlightRepository>();
 builder.Services.AddScoped<IDocument, DocucmentRepository>();
 builder.Services.AddScoped<IOldDocVerRepository, OldDocVerRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();

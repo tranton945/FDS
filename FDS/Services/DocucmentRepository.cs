@@ -7,6 +7,7 @@ using System.Security.Cryptography.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 
 namespace FDS.Services
 {
@@ -75,6 +76,34 @@ namespace FDS.Services
             {
                 return null;
             }
+            return result;
+        }
+
+        public async Task<List<Document>> GetDocumentsByAuthor(string authorName)
+        {
+            var result = await _context.Documents
+                    .Where(doc => doc.Creator.Contains(authorName))
+                    .OrderByDescending(n => n.Id)
+                    .ToListAsync();
+            return result;
+        }
+
+        public async Task<List<Document>> GetDocumentsByDate()
+        {
+            var result = await _context.Documents
+                .OrderByDescending(doc => doc.CreateDate)
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<List<Document>> Search(string searchString)
+        {
+            var result = await _context.Documents
+                                        .Where(s => s.Name.Contains(searchString) || 
+                                        s.Note.Contains(searchString))
+                                        .OrderBy(n => n.Id)
+                                        .ToListAsync();
             return result;
         }
 

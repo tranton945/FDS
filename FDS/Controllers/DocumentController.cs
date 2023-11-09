@@ -88,5 +88,49 @@ namespace FDS.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("Search")]
+        [Authorize]
+        public async Task<IActionResult> Search(string searchString)
+        {
+            try
+            {
+                var result = await _doc.Search(searchString);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("SortByDate")]
+        [Authorize]
+        public async Task<IActionResult> SortByDate()
+        {
+            try
+            {
+                var result = await _doc.GetDocumentsByDate();
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("SortByAuthor")]
+        [Authorize]
+        public async Task<IActionResult> SortByAuthor(string author)
+        {
+            try
+            {
+                var result = await _doc.GetDocumentsByAuthor(author);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
     }
 }
