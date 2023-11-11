@@ -16,6 +16,8 @@ namespace FDS.Data
         public DbSet<OldDocVer> OldDocVers { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserDTO> UserDTOs { get; set; }
+        public DbSet<GroupType> GroupTypes { get; set; }
+        public DbSet<DocType> DocTypes { get; set; }
 
     }
 }

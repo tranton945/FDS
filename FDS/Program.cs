@@ -24,6 +24,8 @@ builder.Services.AddScoped<IFlight, FlightRepository>();
 builder.Services.AddScoped<IDocument, DocucmentRepository>();
 builder.Services.AddScoped<IOldDocVerRepository, OldDocVerRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IDocTypeRepository, DocTypeRepository>();
+builder.Services.AddScoped<GetUser>();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
