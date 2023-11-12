@@ -6,8 +6,8 @@ namespace FDS.Services
     {
         public Task<List<Document>> GetAll();
         public Task<Document> GetById(int id);
-        public Task<Document> Add(Document doc, IFormFile file);
-        public Task<bool> Update(Document doc, int id);
+        public Task<Document> Add(Document doc, IFormFile file, IFormFile signature);
+        public Task<bool> Update(Document doc, int id, IFormFile file, IFormFile signature);
         public Task<bool> Delete(int id);
         public Task<List<Document>> Search(string searchString);
         public Task<List<Document>> GetDocumentsByAuthor(string authorName);

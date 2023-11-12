@@ -16,24 +16,18 @@ namespace FDS.Services
         private readonly FDSDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetUser _getuser;
 
-        public DocucmentRepository(FDSDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor) 
+        public DocucmentRepository(FDSDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, GetUser getuser) 
         {
             _context = context;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _getuser = getuser;
         }
-        public async Task<Document> Add(Document doc, IFormFile file)
+        public async Task<Document> Add(Document doc, IFormFile file, IFormFile signature)
         {
-            // lấy jwt mà user cung cấp
-            var authResult = _httpContextAccessor.HttpContext.AuthenticateAsync().Result;
-            var token = authResult.Properties.GetTokenValue("access_token");
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-            // lấy email từ chuỗi jwt sau khi giải mã jwt
-            var _email = jwtToken.Claims.FirstOrDefault().Value;
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == _email);
+            var user = await _getuser.user();
 
             var _doc = new Document
             {
@@ -42,12 +36,27 @@ namespace FDS.Services
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Version = 1,
-                Creator = user.Name,
-                Signature = doc.Signature,
+                Creator = user.UserName,
                 FlightId = doc.FlightId,
                 DocTypeId = doc.DocTypeId,
-                DocFile = await ConvertFormFileToByteArray(file),
             };
+            if (file != null && file.Length > 0)
+            {
+                _doc.DocFile = await ConvertFormFileToByteArray(file);
+            }
+            else
+            {
+                _doc.DocFile = null;
+            }
+            if (signature != null && signature.Length > 0)
+            {
+                _doc.Signature = await ConvertFormFileToByteArray(signature);
+            }
+            else
+            {
+                _doc.Signature = null;
+            }
+
             await _context.AddAsync(_doc);
             await _context.SaveChangesAsync();
             return _doc;
@@ -117,35 +126,108 @@ namespace FDS.Services
             return result;
         }
 
-        public async Task<bool> Update(Document doc, int id)
+        //public async Task<bool> Update(Document doc, int id, IFormFile file, IFormFile signature)
+        //{
+        //    var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
+        //    if (result == null)
+        //    {
+        //        return false;
+        //    }
+        //    if(result.Signature != null || result.Signature.Length > 0)
+        //    {
+        //        return false;
+        //    }
+
+        //    // create new OldDocVer
+        //    var oldDoc = new OldDocVer
+        //    {
+        //        Name = result.Name,
+        //        Note = result.Note,
+        //        CreateDate = result.CreateDate,
+        //        UpdateDate = DateTime.Now,
+        //        Version = result.Version,
+        //        Creator = result.Creator,
+        //        Signature = result.Signature,
+        //        DocFile = result.DocFile,
+        //        DocId = result.Id
+        //    };
+        //    await _context.OldDocVers.AddAsync(oldDoc);
+
+        //    if (result.DocFile != null || result.DocFile.Length > 0)
+        //    {
+        //        result.DocFile = await ConvertFormFileToByteArray(file);
+        //    }
+        //    result.Name = doc.Name;
+        //    result.Note = doc.Note;
+
+        //    result.Signature = await ConvertFormFileToByteArray(signature);
+
+        //    result.UpdateDate = DateTime.Now;
+        //    if(doc.Version == null || doc.Version == 0 || doc.Version == 1)
+        //    {
+        //        result.Version = result.Version + 0.1f;
+        //    }
+        //    else
+        //    {
+        //        result.Version = doc.Version;
+        //    }
+        //    result.Creator = result.Creator;
+        //    if (doc.FlightId == null || doc.FlightId == 0)
+        //    {
+        //        result.FlightId = result.FlightId;
+        //    }
+        //    else
+        //    {
+        //        result.FlightId = doc.FlightId;
+        //    }
+
+        //    _context.Update(result);
+        //    await _context.SaveChangesAsync();
+
+        //    return true;
+        //}
+        public async Task<bool> Update(Document doc, int id, IFormFile file, IFormFile signature)
         {
             var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
             if (result == null)
             {
                 return false;
             }
-            else
+            if (result.Signature != null && result.Signature.Length > 0)
             {
-                var oldDoc = new OldDocVer
-                {
-                    Name = result.Name,
-                    Note = result.Note,
-                    CreateDate = result.CreateDate,
-                    UpdateDate = DateTime.Now,
-                    Version = result.Version,
-                    Creator = result.Creator,
-                    Signature = result.Signature,
-                    DocId = result.Id
-                };
-                await _context.OldDocVers.AddAsync(oldDoc);
-                //await _context.SaveChangesAsync();
+                return false;
             }
 
-            result.Name = doc.Name;
-            result.Note = doc.Note;
-            //result.CreateDate = result.CreateDate;
+
+            // create new OldDocVer
+            var oldDoc = new OldDocVer
+            {
+                Name = result.Name,
+                Note = result.Note,
+                CreateDate = result.CreateDate,
+                UpdateDate = DateTime.Now,
+                Version = result.Version,
+                Creator = result.Creator,
+                Signature = result.Signature,
+                DocFile = result.DocFile,
+                DocId = result.Id
+            };
+            await _context.OldDocVers.AddAsync(oldDoc);
+
+            if (file != null && file.Length > 0)
+            {
+                result.DocFile = await ConvertFormFileToByteArray(file);
+            }
+            result.Name = doc.Name ?? result.Name;
+            result.Note = doc.Note ?? result.Note;
+
+            if (signature != null && signature.Length > 0)
+            {
+                result.Signature = await ConvertFormFileToByteArray(signature);
+            }
+
             result.UpdateDate = DateTime.Now;
-            if(doc.Version == null || doc.Version == 0)
+            if (doc.Version == null || doc.Version == 0 || doc.Version == 1)
             {
                 result.Version = result.Version + 0.1f;
             }
@@ -154,15 +236,8 @@ namespace FDS.Services
                 result.Version = doc.Version;
             }
             result.Creator = result.Creator;
-            result.Signature = doc.Signature;
-            if (doc.FlightId == null || doc.FlightId == 0)
-            {
-                result.FlightId = result.FlightId;
-            }
-            else
-            {
-                result.FlightId = doc.FlightId;
-            }
+            result.FlightId = doc.FlightId ?? result.FlightId;
+
 
             _context.Update(result);
             await _context.SaveChangesAsync();

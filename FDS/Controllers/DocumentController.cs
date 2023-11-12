@@ -20,11 +20,11 @@ namespace FDS.Controllers
 
         [HttpPost("AddDoc")]
         [Authorize]
-        public async Task<IActionResult> AddDoc([FromForm] Document doc, IFormFile file)
+        public async Task<IActionResult> AddDoc([FromForm] Document doc, IFormFile? file, IFormFile? signature)
         {
             try
             {
-                var result = await _doc.Add(doc, file);
+                var result = await _doc.Add(doc, file, signature);
                 return Ok(result);
             }
             catch
@@ -61,11 +61,11 @@ namespace FDS.Controllers
 
         [HttpPut("UpdateDoc")]
         [Authorize]
-        public async Task<IActionResult> UpdateDoc(Document doc ,int id)
+        public async Task<IActionResult> UpdateDoc([FromForm] Document? doc ,int id, IFormFile? file, IFormFile? signature)
         {
             try
             {
-                var result = await _doc.Update(doc, id);
+                var result = await _doc.Update(doc, id, file, signature);
                 return Ok(result);
             }
             catch
