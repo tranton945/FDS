@@ -8,6 +8,10 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using FDS.Helper;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 
 namespace FDS.Services
 {
@@ -18,7 +22,7 @@ namespace FDS.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetUser _getuser;
 
-        public DocucmentRepository(FDSDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, GetUser getuser) 
+        public DocucmentRepository(FDSDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, GetUser getuser)
         {
             _context = context;
             _userManager = userManager;
@@ -91,7 +95,7 @@ namespace FDS.Services
         public async Task<Document> GetById(int id)
         {
             var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
-            if(result == null)
+            if (result == null)
             {
                 return null;
             }
@@ -119,73 +123,13 @@ namespace FDS.Services
         public async Task<List<Document>> Search(string searchString)
         {
             var result = await _context.Documents
-                                        .Where(s => s.Name.Contains(searchString) || 
+                                        .Where(s => s.Name.Contains(searchString) ||
                                         s.Note.Contains(searchString))
                                         .OrderBy(n => n.Id)
                                         .ToListAsync();
             return result;
         }
 
-        //public async Task<bool> Update(Document doc, int id, IFormFile file, IFormFile signature)
-        //{
-        //    var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
-        //    if (result == null)
-        //    {
-        //        return false;
-        //    }
-        //    if(result.Signature != null || result.Signature.Length > 0)
-        //    {
-        //        return false;
-        //    }
-
-        //    // create new OldDocVer
-        //    var oldDoc = new OldDocVer
-        //    {
-        //        Name = result.Name,
-        //        Note = result.Note,
-        //        CreateDate = result.CreateDate,
-        //        UpdateDate = DateTime.Now,
-        //        Version = result.Version,
-        //        Creator = result.Creator,
-        //        Signature = result.Signature,
-        //        DocFile = result.DocFile,
-        //        DocId = result.Id
-        //    };
-        //    await _context.OldDocVers.AddAsync(oldDoc);
-
-        //    if (result.DocFile != null || result.DocFile.Length > 0)
-        //    {
-        //        result.DocFile = await ConvertFormFileToByteArray(file);
-        //    }
-        //    result.Name = doc.Name;
-        //    result.Note = doc.Note;
-
-        //    result.Signature = await ConvertFormFileToByteArray(signature);
-
-        //    result.UpdateDate = DateTime.Now;
-        //    if(doc.Version == null || doc.Version == 0 || doc.Version == 1)
-        //    {
-        //        result.Version = result.Version + 0.1f;
-        //    }
-        //    else
-        //    {
-        //        result.Version = doc.Version;
-        //    }
-        //    result.Creator = result.Creator;
-        //    if (doc.FlightId == null || doc.FlightId == 0)
-        //    {
-        //        result.FlightId = result.FlightId;
-        //    }
-        //    else
-        //    {
-        //        result.FlightId = doc.FlightId;
-        //    }
-
-        //    _context.Update(result);
-        //    await _context.SaveChangesAsync();
-
-        //    return true;
-        //}
         public async Task<bool> Update(Document doc, int id, IFormFile file, IFormFile signature)
         {
             var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
@@ -243,6 +187,38 @@ namespace FDS.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<Document>> GetDocumentsByFilghtId(int flightId)
+        {
+            var result = await _context.Documents
+                    .Where(doc => doc.FlightId == flightId)
+                    .ToListAsync();
+            return result;
+        }
+
+        public async Task<Document> DowloadDocumentById(int id)
+        {
+            var document = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
+
+            if (document == null || document.DocFile == null || document.DocFile.Length <= 0)
+            {
+                return null;
+            }
+            return document;
+
+        }
+
+        public async Task<List<Data.Document>> DowloadDocumentByFlightId(int id)
+        {
+            var result = await _context.Documents
+                .Where(doc => doc.FlightId == id)
+                .ToListAsync();
+            if(result.Count == 0)
+            {
+                return null;
+            }
+            return result;
         }
     }
 }

@@ -12,5 +12,9 @@ namespace FDS.Services
         public Task<List<Document>> Search(string searchString);
         public Task<List<Document>> GetDocumentsByAuthor(string authorName);
         public Task<List<Document>> GetDocumentsByDate();
+        public Task<List<Document>> GetDocumentsByFilghtId(int flightId);
+
+        public Task<Document> DowloadDocumentById(int id);
+        public Task<List<Document>> DowloadDocumentByFlightId(int id);
     }
 }

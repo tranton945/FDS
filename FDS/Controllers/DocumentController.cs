@@ -131,5 +131,43 @@ namespace FDS.Controllers
             }
         }
 
+        [HttpGet("DownloadById")]
+        public async Task<IActionResult> DownloadById(int id)
+        {
+            try
+            {
+                var result = await _doc.DowloadDocumentById(id);
+                if (result == null)
+                {
+                    return BadRequest("Document not found or empty.");
+                }
+                var zipBytes = ZipHelper.CreateZipFile(result.Name, result.DocFile);
+
+                return File(zipBytes, "application/zip", $"{DateTime.Now}.zip");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("DownloadByFlightId")]
+        public async Task<IActionResult> DowloadDocumentByFlightId(int id)
+        {
+            try
+            {
+                var result = await _doc.DowloadDocumentByFlightId(id);
+                if (result == null)
+                {
+                    return BadRequest("Document not found or empty.");
+                }
+                var zipBytes = ZipHelper.CreateZipFileFromDocuments(result, $"{DateTime.Now}.zip");
+                return File(zipBytes, "application/zip", $"{DateTime.Now}.zip");
+
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

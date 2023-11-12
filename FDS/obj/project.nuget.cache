@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "zJimQ1QsPgxMzejvhp829o1EgcjUbOWBTOO2etK43WGXRdaZRuszQbcVXSbKZaEaHZYPJescIy79bOkQWARceA==",
+  "dgSpecHash": "tbtLjw0tT0CKqq+XBRAvWXPFZjV7wLQ+Hb0JNygmvIb2vIYtsyWjX7r47MeuaFkYvPr8wZtgR0SEq7v/w22g3Q==",
   "success": true,
   "projectFilePath": "D:\\ojt\\FlightDocs System\\source\\FDS\\FDS\\FDS.csproj",
   "expectedPackageFiles": [
@@ -43,6 +43,7 @@
     "C:\\Users\\trant\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
     "C:\\Users\\trant\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\trant\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
+    "C:\\Users\\trant\\.nuget\\packages\\sharpziplib\\1.4.2\\sharpziplib.1.4.2.nupkg.sha512",
     "C:\\Users\\trant\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
     "C:\\Users\\trant\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.2.3\\swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
     "C:\\Users\\trant\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.2.3\\swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
