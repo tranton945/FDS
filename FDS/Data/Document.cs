@@ -14,9 +14,16 @@ namespace FDS.Data
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public float Version { get; set; }
-        //[JsonIgnore]
-        public string Creator { get; set; }
-        public byte[]? Signature { get; set; } = null!;
+        public string? Creator { get; set; }
+        public byte[]? Signature { get; set; }
+        //[NotMapped]
+        public byte[]? DocFile { get; set; }
+        //public IFormFile DocFile { get; set; }
+
+        public int? DocTypeId { get; set; }
+        [ForeignKey(nameof(DocTypeId))]
+        [JsonIgnore]
+        public DocType? DocType { get; set; }
 
         public int? FlightId { get; set; } 
         [ForeignKey(nameof(FlightId))]

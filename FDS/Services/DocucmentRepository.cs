@@ -23,7 +23,7 @@ namespace FDS.Services
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<Document> Add(Document doc)
+        public async Task<Document> Add(Document doc, IFormFile file)
         {
             // lấy jwt mà user cung cấp
             var authResult = _httpContextAccessor.HttpContext.AuthenticateAsync().Result;
@@ -45,10 +45,20 @@ namespace FDS.Services
                 Creator = user.Name,
                 Signature = doc.Signature,
                 FlightId = doc.FlightId,
+                DocTypeId = doc.DocTypeId,
+                DocFile = await ConvertFormFileToByteArray(file),
             };
             await _context.AddAsync(_doc);
             await _context.SaveChangesAsync();
             return _doc;
+        }
+        private async Task<byte[]> ConvertFormFileToByteArray(IFormFile formFile)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await formFile.CopyToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
         }
 
         public async Task<bool> Delete(int id)

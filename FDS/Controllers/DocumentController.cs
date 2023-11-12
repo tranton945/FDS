@@ -20,12 +20,11 @@ namespace FDS.Controllers
 
         [HttpPost("AddDoc")]
         [Authorize]
-        public async Task<IActionResult> AddDoc(Document doc)
+        public async Task<IActionResult> AddDoc([FromForm] Document doc, IFormFile file)
         {
             try
             {
-                //var id =Convert.ToInt32(HttpContext.User.FindFirstValue("userId"));
-                var result = await _doc.Add(doc);
+                var result = await _doc.Add(doc, file);
                 return Ok(result);
             }
             catch
