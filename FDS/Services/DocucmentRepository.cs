@@ -81,6 +81,25 @@ namespace FDS.Services
             {
                 return false;
             }
+            if (result.Creator == "Admin" || result.Creator == "GO")
+            {
+                return false;
+            }
+            // create new OldDocVer
+            var oldDoc = new OldDocVer
+            {
+                Name = result.Name,
+                Note = result.Note,
+                CreateDate = result.CreateDate,
+                UpdateDate = DateTime.Now,
+                Version = result.Version,
+                Creator = result.Creator,
+                Signature = result.Signature,
+                DocFile = result.DocFile,
+                DocId = result.Id
+            };
+            await _context.OldDocVers.AddAsync(oldDoc);
+
             _context.Remove(result);
             await _context.SaveChangesAsync();
             return true;
