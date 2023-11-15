@@ -129,6 +129,27 @@ namespace FDS.Services
             return accounts;
         }
 
+        public async Task<AccountWithRolesDto> GetAccountRole(string email)
+        {
+            var accounts = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (accounts == null)
+            {
+                return null;
+            }
+
+            var roles = await _userManager.GetRolesAsync(accounts);
+
+            var accountWithRoles = new AccountWithRolesDto
+            {
+                UserName = accounts.UserName,
+                Email = accounts.Email,
+                Roles = roles.ToList()
+            };
+
+            return accountWithRoles;
+        }
+
         public async Task<bool> UpdateAccount(string email, string newName, DateTime newDateOfBirt, string newGender)
         {
             if (!email.EndsWith("@vietjetair.com"))

@@ -19,5 +19,6 @@ namespace FDS.Services
         public Task<bool> UpdatePassword(ChangePasswordModel model);
         public Task<bool> DeleteAccount(string email);
 
+        public Task<AccountWithRolesDto> GetAccountRole(string email);
     }
 }

@@ -78,6 +78,20 @@ namespace FDS.Controllers
                 return BadRequest();
             }
         }
+        [HttpGet("SelectAccountRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SelectAccountRole(string email)
+        {
+            try
+            {
+                var result = await _account.GetAccountRole(email);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
         [HttpPut("UpdateAccount")]
         [Authorize(Roles = "Admin")]

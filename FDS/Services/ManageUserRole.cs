@@ -15,11 +15,13 @@ namespace FDS.Services
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FDSDbContext _context;
 
-        public ManageUserRole(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public ManageUserRole(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, FDSDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _context = context;
         }
 
         public async Task<IdentityResult> AddUserRole(string email, string roleName)
