@@ -15,8 +15,7 @@ namespace FDS.Data
         public string? Createtor { get; set; }
         public DateTime CreateDate { get; set; }
 
-        //[NotMapped]
-        //[JsonIgnore]
+
         public ICollection<GroupType>? GroupTypes { get; set; }
     }
 }

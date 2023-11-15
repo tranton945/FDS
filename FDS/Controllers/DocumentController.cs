@@ -33,11 +33,13 @@ namespace FDS.Controllers
             }
         }
         [HttpGet("GetAllDoc")]
+        [Authorize]
         public async Task<IActionResult> GetAllDoc()
         {
             try
             {
                 var result = await _doc.GetAll();
+
                 return Ok(result);
             }
             catch
@@ -46,11 +48,16 @@ namespace FDS.Controllers
             }
         }
         [HttpGet("GetDocById")]
+        [Authorize]
         public async Task<IActionResult> GetDocById(int id)
         {
             try
             {
                 var result = await _doc.GetById(id);
+                if (result == null)
+                {
+                    return Unauthorized("No Permission");
+                }
                 return Ok(result);
             }
             catch
@@ -132,6 +139,7 @@ namespace FDS.Controllers
         }
 
         [HttpGet("DownloadById")]
+        [Authorize]
         public async Task<IActionResult> DownloadById(int id)
         {
             try
@@ -151,6 +159,7 @@ namespace FDS.Controllers
             }
         }
         [HttpGet("DownloadByFlightId")]
+        [Authorize]
         public async Task<IActionResult> DowloadDocumentByFlightId(int id)
         {
             try

@@ -24,10 +24,6 @@ namespace FDS.Services
 
         public async Task<IdentityResult> AddUserRole(string email, string roleName)
         {
-            //var user = await _userManager.FindByEmailAsync(email);
-
-            //var role = await _roleManager.FindByNameAsync(roleName);
-
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
             var role = await _roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName);
 

@@ -17,6 +17,13 @@ namespace FDS.Services
         public async Task<DocType> Add(DocType type)
         {
             var user = await _getUser.user();
+            var AllType  = await _context.DocTypes.ToListAsync();
+            if (AllType.Any(doc => doc.DocumentType == type.DocumentType))
+            {
+                // Tên của Doc mới trùng với một Doc đã có
+                return null;
+            }
+
             var _type = new DocType
             {
                 DocumentType = type.DocumentType,

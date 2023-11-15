@@ -18,6 +18,5 @@ namespace FDS.Data
         [ForeignKey(nameof(GroupId))]
         [JsonIgnore]
         public Group? Group { get; set; }
-
     }
 }

@@ -16,10 +16,7 @@ namespace FDS.Data
         public DateTime CreateDate { get; set; }
         public string? Note { get; set; }
         public string? Creator { get; set; }
-        //public List<UserDTO>? Member { get; set; }
         public ICollection<UserDTO>? Members { get; set; }
-        //[NotMapped]
-        //[JsonIgnore]
         public ICollection<GroupType>? GroupTypes { get; set; }
     }
 }

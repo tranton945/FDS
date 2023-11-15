@@ -95,10 +95,19 @@ namespace FDS.Services
         public async Task<Document> GetById(int id)
         {
             var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
+
             if (result == null)
             {
                 return null;
             }
+            var groupType = await _getuser.ListGroupsType();
+            var getPermission = groupType.SingleOrDefault(g => g.DocTypeId == result.DocTypeId);
+            //var _getPermission = groupType.Select(g => g.DocTypeId == result.DocTypeId).ToList();
+            if (getPermission.Permission == null || getPermission.Permission == "No Permission")
+            {
+                return null;
+            }
+
             return result;
         }
 
@@ -142,6 +151,12 @@ namespace FDS.Services
                 return false;
             }
 
+            var groupType = await _getuser.ListGroupsType();
+            var getPermission = groupType.SingleOrDefault(g => g.DocTypeId == result.DocTypeId);
+            if (getPermission.Permission == null || getPermission.Permission == "No Permission" || getPermission.Permission == "Read only")
+            {
+                return false;
+            }
 
             // create new OldDocVer
             var oldDoc = new OldDocVer
