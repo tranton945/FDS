@@ -26,16 +26,10 @@ builder.Services.AddScoped<IOldDocVerRepository, OldDocVerRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IDocTypeRepository, DocTypeRepository>();
 builder.Services.AddScoped<GetUser>();
+builder.Services.AddScoped<CreateAdminAccount>();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
-
-
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
-//    c.OperationFilter<DateTimeFormatOperationFilter>();
-//});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,11 +62,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
 // Allows access from any source
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => 
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
+
+// call CreateAdminAccount to create admin account, if this account don't exist 
+using (var scope = app.Services.CreateScope())
+{
+    var myService = scope.ServiceProvider.GetRequiredService<CreateAdminAccount>();
+    await myService.Start();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

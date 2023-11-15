@@ -40,9 +40,7 @@ namespace FDS.Services
             if(!result.Succeeded) 
             {
                 return string.Empty;
-            }
-
-            
+            }            
 
             var autClaims = new List<Claim>
             {
