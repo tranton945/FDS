@@ -1,5 +1,6 @@
 ﻿using FDS.Models;
 using FDS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,16 @@ namespace FDS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles ="Admin")]
     public class RolesController : ControllerBase
     {
         private readonly Roles _roles;
+        private readonly BlacklistService _blacklistService;
 
-        public RolesController(Roles roles)
+        public RolesController(Roles roles, BlacklistService blacklistService)
         {
             _roles = roles;
+            _blacklistService = blacklistService;
         }
 
         [HttpGet]
@@ -24,6 +28,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 return Ok(_roles.GetAllRoles());
             }
             catch
@@ -32,12 +40,16 @@ namespace FDS.Controllers
             }
         }
 
-        [HttpGet("{role}")]
+        [HttpGet("role")]
         public async Task<IActionResult> GetRole(string role)
         {
             var _role = _roles.GetByName(role);
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 return Ok(_role);
             }
             catch
@@ -57,11 +69,15 @@ namespace FDS.Controllers
             return Unauthorized();
         }
 
-        [HttpDelete("{role}")]
-        public IActionResult DeleteRole(string role)
+        [HttpDelete("role")]
+        public async Task<IActionResult> DeleteRole(string role)
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 _roles.DeleteRole(role);
                 return Ok();
             }

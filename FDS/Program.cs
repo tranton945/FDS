@@ -27,6 +27,7 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IDocTypeRepository, DocTypeRepository>();
 builder.Services.AddScoped<GetUser>();
 builder.Services.AddScoped<CreateAdminAccount>();
+builder.Services.AddScoped<BlacklistService>();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();

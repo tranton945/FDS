@@ -12,10 +12,12 @@ namespace FDS.Controllers
     public class DocumentController : ControllerBase
     {
         private readonly IDocument _doc;
+        private readonly BlacklistService _blacklistService;
 
-        public DocumentController(IDocument doc) 
+        public DocumentController(IDocument doc, BlacklistService blacklistService) 
         { 
             _doc = doc;
+            _blacklistService = blacklistService;
         }
 
         [HttpPost("AddDoc")]
@@ -24,6 +26,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.Add(doc, file, signature);
                 return Ok(result);
             }
@@ -38,6 +44,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if(await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.GetAll();
 
                 return Ok(result);
@@ -53,6 +63,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.GetById(id);
                 if (result == null)
                 {
@@ -72,6 +86,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.Update(doc, id, file, signature);
                 return Ok(result);
             }
@@ -86,6 +104,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.Delete(id);
                 return Ok(result);
             }
@@ -101,6 +123,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.Search(searchString);
                 return Ok(result);
             }
@@ -115,6 +141,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.GetDocumentsByDate();
                 return Ok(result);
             }
@@ -129,6 +159,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.GetDocumentsByAuthor(author);
                 return Ok(result);
             }
@@ -144,6 +178,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.DowloadDocumentById(id);
                 if (result == null)
                 {
@@ -164,6 +202,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _doc.DowloadDocumentByFlightId(id);
                 if (result == null)
                 {

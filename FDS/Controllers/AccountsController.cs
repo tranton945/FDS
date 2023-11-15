@@ -13,10 +13,12 @@ namespace FDS.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IAccountRepository _account;
+        private readonly BlacklistService _blacklistService;
 
-        public AccountsController(IAccountRepository account) 
+        public AccountsController(IAccountRepository account, BlacklistService blacklistService) 
         {
             _account = account;
+            _blacklistService = blacklistService;
         }
 
         [HttpPost("SignUp")]
@@ -55,6 +57,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.GetAllAccounts();
                 return Ok(result);
             }
@@ -70,6 +76,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.GetAccountsByEmail(email);
                 return Ok(result);
             }
@@ -84,6 +94,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.GetAccountRole(email);
                 return Ok(result);
             }
@@ -99,6 +113,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.UpdateAccount(email, newName, newDateOfBirt, newGender);
                 return Ok(result);
             }
@@ -114,6 +132,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.UpdatePassword(model);
                 return Ok(result);
             }
@@ -129,6 +151,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _account.DeleteAccount(email);
                 return Ok(result);
             }

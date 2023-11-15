@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FDS.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ namespace FDS.Data
         public DbSet<UserDTO> UserDTOs { get; set; }
         public DbSet<GroupType> GroupTypes { get; set; }
         public DbSet<DocType> DocTypes { get; set; }
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
     }
 }

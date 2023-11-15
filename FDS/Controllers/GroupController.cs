@@ -8,13 +8,16 @@ namespace FDS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GroupController : ControllerBase
     {
         private readonly IGroupRepository group;
+        private readonly BlacklistService _blacklistService;
 
-        public GroupController(IGroupRepository g)
+        public GroupController(IGroupRepository g, BlacklistService blacklistService)
         {
             group = g;
+            _blacklistService = blacklistService;
         }
 
         [HttpPost]
@@ -23,6 +26,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.Add(g);
                 return Ok(result);
             }
@@ -38,6 +45,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.AddMember(username, groupId);
                 return Ok(result);
             }
@@ -54,6 +65,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.GetAll();
                 return Ok(result);
             }
@@ -62,12 +77,16 @@ namespace FDS.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("GetAllById")]
+        [HttpGet("GetById")]
         [Authorize]
-        public async Task<IActionResult> GetAllById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.GetById(id);
                 return Ok(result);
             }
@@ -83,6 +102,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.Delete(id);
                 return Ok(result);
             }
@@ -98,6 +121,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await group.Update(g, id);
                 return Ok(result);
             }

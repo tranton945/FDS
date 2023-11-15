@@ -1,5 +1,6 @@
 ﻿using FDS.Data;
 using FDS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,13 +8,16 @@ namespace FDS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FlightController : ControllerBase
     {
         private readonly IFlight _flight;
+        private readonly BlacklistService _blacklistService;
 
-        public FlightController(IFlight flight) 
+        public FlightController(IFlight flight, BlacklistService blacklistService) 
         {
             _flight = flight;
+            _blacklistService = blacklistService;
         }
 
         [HttpPost]
@@ -21,6 +25,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _flight.Add(flight);
                 return Ok(result);
             }
@@ -35,6 +43,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _flight.GetAll();
                 return Ok(result);
             }
@@ -49,6 +61,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _flight.GetById(id);
                 if (result == null)
                 {
@@ -66,6 +82,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _flight.Update(flight, id);
                 if (result == true)
                 {
@@ -83,6 +103,10 @@ namespace FDS.Controllers
         {
             try
             {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
                 var result = await _flight.Delete(id);
                 if (result == true)
                 {

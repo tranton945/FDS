@@ -1,5 +1,7 @@
 ﻿using FDS.Data;
+using FDS.Migrations;
 using FDS.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +19,18 @@ namespace FDS.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly FDSDbContext _context;
+        private readonly BlacklistService _blacklistService;
 
-        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration) 
+        public AccountRepository(BlacklistService blacklistService, FDSDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration) 
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
+            _context = context;
+            _blacklistService = blacklistService;
         }
 
         public async Task<string> SignInAsync(SignInModel model)
@@ -87,6 +95,18 @@ namespace FDS.Services
 
         public async Task<bool> SignOut()
         {
+            var authResult = _httpContextAccessor.HttpContext.AuthenticateAsync().Result;
+            var token = authResult.Properties.GetTokenValue("access_token");
+            if (await _blacklistService.CheckJWT() == false)
+            {
+                var tokenBlacklist = new Data.BlacklistedToken
+                {
+                    Token = token,
+                };
+                await _context.BlacklistedTokens.AddAsync(tokenBlacklist);
+
+            }
+            await _context.SaveChangesAsync();
             await _signInManager.SignOutAsync();
             return true;
         }
