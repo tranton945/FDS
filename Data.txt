@@ -1,0 +1,58 @@
+Dạng truyền data
+===================================== DocType =====================================
+------------------- method addType -------------------
+{
+  "id": 0,
+  "documentType": "Load Summary zzzzzz",
+  "note": "Load Summary",
+  "createtor": "string",
+  "createDate": "2023-11-10T09:06:25.075Z",
+  "groupTypes": [
+    {
+      "groupId": 1,
+      "permission": "Read only"
+    },
+    {
+      "groupId": 2,
+      "permission": "No Permission"
+    },
+    {
+      "groupId": 3,
+      "permission": "Read and modify"
+    }
+  ]
+}
+------------------- method addType -------------------
+dùng cấu trúc tương tự addType
+
+===================================== Docmunet =====================================
+------------------- method addDocument -------------------
+postman
+body - form-data
+key:
+
+Name
+Note
+FlightId
+DocTypeId
+file (data type file)
+signature (data type file)
+------------------- method updateDocument -------------------
+postman
+body - form-data
+chọn trường cần update
+
+===================================== Group =====================================
+------------------- method addDocument -------------------
+{
+  "id": 0,
+  "name": "Admin",
+  "createDate": "2023-11-17T07:47:03.616Z",
+  "note": "Admin",
+  "creator": ""
+}
+------------------- method AddMemberToGroup -------------------
+[
+  "Username",
+  "Username"
+]
