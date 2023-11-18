@@ -17,5 +17,6 @@ namespace FDS.Data
 
 
         public ICollection<GroupType>? GroupTypes { get; set; }
+        public ICollection<Document>? Documents { get; set; }
     }
 }

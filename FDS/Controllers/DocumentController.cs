@@ -49,7 +49,10 @@ namespace FDS.Controllers
                     return BadRequest("access token invalid");
                 }
                 var result = await _doc.GetAll();
-
+                if(result ==  null)
+                {
+                    return BadRequest("No Permission");
+                }
                 return Ok(result);
             }
             catch

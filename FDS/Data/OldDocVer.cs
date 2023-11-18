@@ -18,7 +18,7 @@ namespace FDS.Data
         public byte[]? Signature { get; set; }
         public byte[]? DocFile { get; set; }
         public int DocId { get; set; }
-        [ForeignKey(nameof(DocId))]
+        //[ForeignKey(nameof(DocId))]
         //[JsonIgnore]
         public Document? Doc { get; set; }
     }

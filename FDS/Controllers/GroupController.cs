@@ -8,7 +8,7 @@ namespace FDS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin, GO")]
     public class GroupController : ControllerBase
     {
         private readonly IGroupRepository group;
@@ -21,7 +21,6 @@ namespace FDS.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Add(Data.Group g)
         {
             try
@@ -40,7 +39,6 @@ namespace FDS.Controllers
         }
 
         [HttpPost("AddMemberToGroup")]
-        [Authorize]
         public async Task<IActionResult> AddMemberToGroup([FromBody] List<string> username, int groupId)
         {
             try
@@ -60,7 +58,6 @@ namespace FDS.Controllers
 
 
         [HttpGet("GetAll")]
-        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -78,7 +75,6 @@ namespace FDS.Controllers
             }
         }
         [HttpGet("GetById")]
-        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -97,7 +93,6 @@ namespace FDS.Controllers
         }
 
         [HttpDelete("DeleteGroup")]
-        [Authorize]
         public async Task<IActionResult> DeleteGroup(int id)
         {
             try
@@ -115,8 +110,7 @@ namespace FDS.Controllers
             }
         }
 
-        [HttpPost("Update")]
-        [Authorize]
+        [HttpPut("Update")]
         public async Task<IActionResult> UpdateGroup(Data.Group g, int id)
         {
             try
@@ -126,6 +120,25 @@ namespace FDS.Controllers
                     return BadRequest("access token invalid");
                 }
                 var result = await group.Update(g, id);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut("DeleteMembers")]
+        public async Task<IActionResult> DeleteMembers(List<string> listUsername, int groupId)
+        {
+            try
+            {
+                if (await _blacklistService.CheckJWT() == true)
+                {
+                    return BadRequest("access token invalid");
+                }
+                var result = await group.DeleteMembers(listUsername, groupId);
                 return Ok(result);
             }
             catch

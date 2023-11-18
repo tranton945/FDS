@@ -29,10 +29,57 @@ namespace FDS.Services
             _httpContextAccessor = httpContextAccessor;
             _getuser = getuser;
         }
-        public async Task<Document> Add(Document doc, IFormFile file, IFormFile signature)
+
+        public async Task<bool> checkAdminAccount()
         {
             var user = await _getuser.user();
+            var adminRole = await _userManager.GetRolesAsync(user);
+            if (adminRole.Any(a => a.ToUpper() == "ADMIN"))
+            {
+                return true;
+            }
+            return false;
+        }
+        public async Task<string> checkPermission(int? docId)
+        {
+            var groupType = await _getuser.ListGroupsType();
+            if (groupType.Count == 0)
+            {
+                return "NO PERMISSION";
+            }
+            var _getPermission = groupType.Select(g => g.DocTypeId == docId).ToList();
+            var getPermission = groupType.SingleOrDefault(g => g.DocTypeId == docId);
+            if (getPermission.Permission == null || getPermission.Permission.ToUpper() == "NO PERMISSION" || getPermission == null)
+            {
+                return "NO PERMISSION";
+            }
+            return getPermission.Permission.ToUpper();
+        }
+        public async Task<Document> Add(Document doc, IFormFile file, IFormFile signature)
+        {
+            if(await checkAdminAccount() == true)
+            {
+                var result = await AddSecondary(doc, file, signature);
+                return result;
+            }
+            if(await checkPermission(doc.DocTypeId) == "NO PERMISSION") 
+            {
+                return null;
+            }
+            var _result = await AddSecondary(doc, file, signature);
 
+            return _result;
+        }
+
+        public async Task<Document> AddSecondary(Document doc, IFormFile file, IFormFile signature)
+        {
+            var user = await _getuser.user();
+            var check = await _context.Documents.ToListAsync();
+            if (check.Any(checkname => checkname.Name == doc.Name))
+            {
+                // Tên của Doc mới trùng với một Doc đã có
+                return null;
+            }
             var _doc = new Document
             {
                 Name = doc.Name,
@@ -65,6 +112,7 @@ namespace FDS.Services
             await _context.SaveChangesAsync();
             return _doc;
         }
+
         private async Task<byte[]> ConvertFormFileToByteArray(IFormFile formFile)
         {
             using (var memoryStream = new MemoryStream())
@@ -81,48 +129,52 @@ namespace FDS.Services
             {
                 return false;
             }
-            if (result.Creator == "Admin" || result.Creator == "GO")
+            if (await checkAdminAccount() == true)
+            {
+                _context.Documents.Remove(result);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            if (await checkPermission(result.DocTypeId) == "READ ONLY" || await checkPermission(result.DocTypeId) == "NO PERMISSION")
             {
                 return false;
             }
-            // create new OldDocVer
-            var oldDoc = new OldDocVer
-            {
-                Name = result.Name,
-                Note = result.Note,
-                CreateDate = result.CreateDate,
-                UpdateDate = DateTime.Now,
-                Version = result.Version,
-                Creator = result.Creator,
-                Signature = result.Signature,
-                DocFile = result.DocFile,
-                DocId = result.Id
-            };
-            await _context.OldDocVers.AddAsync(oldDoc);
 
-            _context.Remove(result);
+            var accounts = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == result.Creator);
+            var userRole = await _userManager.GetRolesAsync(accounts);
+            bool checkRole = userRole.Any(role => role.ToUpper() == "ADMIN" || role.ToUpper() == "GO");
+            if (!checkRole)
+            {
+                return false;
+            }
+            _context.Documents.Remove(result);
             await _context.SaveChangesAsync();
             return true;
         }
 
         public async Task<List<Document>> GetAll()
         {
+            if (await checkAdminAccount() == false)
+            {
+                return null;
+            }
             var result = await _context.Documents.ToListAsync();
             return result;
         }
 
         public async Task<Document> GetById(int id)
         {
-            var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
 
+            var result = await _context.Documents.SingleOrDefaultAsync(i => i.Id == id);
             if (result == null)
             {
                 return null;
             }
-            var groupType = await _getuser.ListGroupsType();
-            var getPermission = groupType.SingleOrDefault(g => g.DocTypeId == result.DocTypeId);
-            //var _getPermission = groupType.Select(g => g.DocTypeId == result.DocTypeId).ToList();
-            if (getPermission.Permission == null || getPermission.Permission == "No Permission")
+            if (await checkAdminAccount() == true)
+            {
+                return result;
+            }
+            if (await checkPermission(result.DocTypeId) == "NO PERMISSION")
             {
                 return null;
             }
@@ -165,59 +217,72 @@ namespace FDS.Services
             {
                 return false;
             }
-            if (result.Signature != null && result.Signature.Length > 0)
+            if (await checkAdminAccount() == true)
+            {
+                var Update = await UpdateSecondary(doc, id, file, signature, result);
+                return Update;
+            }
+
+            if (await checkPermission(result.DocTypeId) == "READ ONLY" || await checkPermission(result.DocTypeId) == "NO PERMISSION")
             {
                 return false;
             }
-
-            var groupType = await _getuser.ListGroupsType();
-            var getPermission = groupType.SingleOrDefault(g => g.DocTypeId == result.DocTypeId);
-            if (getPermission.Permission == null || getPermission.Permission == "No Permission" || getPermission.Permission == "Read only")
+            var _Update = await UpdateSecondary(doc, id, file, signature, result);
+            return _Update;
+        }
+        public async Task<bool> UpdateSecondary(Document doc, int id, IFormFile file, IFormFile signature, Document availableDoc)
+        {
+            if (availableDoc.Signature != null && availableDoc.Signature.Length > 0)
             {
+                return false;
+            }
+            var check = await _context.Documents.ToListAsync();
+            if (check.Any(checkname => checkname.Name == doc.Name))
+            {
+                // Tên của Doc mới trùng với một Doc đã có
                 return false;
             }
 
             // create new OldDocVer
             var oldDoc = new OldDocVer
             {
-                Name = result.Name,
-                Note = result.Note,
-                CreateDate = result.CreateDate,
+                Name = availableDoc.Name,
+                Note = availableDoc.Note,
+                CreateDate = availableDoc.CreateDate,
                 UpdateDate = DateTime.Now,
-                Version = result.Version,
-                Creator = result.Creator,
-                Signature = result.Signature,
-                DocFile = result.DocFile,
-                DocId = result.Id
+                Version = availableDoc.Version,
+                Creator = availableDoc.Creator,
+                Signature = availableDoc.Signature,
+                DocFile = availableDoc.DocFile,
+                DocId = availableDoc.Id
             };
             await _context.OldDocVers.AddAsync(oldDoc);
 
             if (file != null && file.Length > 0)
             {
-                result.DocFile = await ConvertFormFileToByteArray(file);
+                availableDoc.DocFile = await ConvertFormFileToByteArray(file);
             }
-            result.Name = doc.Name ?? result.Name;
-            result.Note = doc.Note ?? result.Note;
+            availableDoc.Name = doc.Name ?? availableDoc.Name;
+            availableDoc.Note = doc.Note ?? availableDoc.Note;
 
             if (signature != null && signature.Length > 0)
             {
-                result.Signature = await ConvertFormFileToByteArray(signature);
+                availableDoc.Signature = await ConvertFormFileToByteArray(signature);
             }
 
-            result.UpdateDate = DateTime.Now;
-            if (doc.Version == null || doc.Version == 0 || doc.Version == 1)
+            availableDoc.UpdateDate = DateTime.Now;
+            if (doc.Version == null || doc.Version <= availableDoc.Version)
             {
-                result.Version = result.Version + 0.1f;
+                availableDoc.Version = availableDoc.Version + 0.1f;
             }
             else
             {
-                result.Version = doc.Version;
+                availableDoc.Version = doc.Version;
             }
-            result.Creator = result.Creator;
-            result.FlightId = doc.FlightId ?? result.FlightId;
+            availableDoc.Creator = availableDoc.Creator;
+            availableDoc.FlightId = doc.FlightId ?? availableDoc.FlightId;
 
-
-            _context.Update(result);
+            _context.Update(availableDoc);
             await _context.SaveChangesAsync();
 
             return true;

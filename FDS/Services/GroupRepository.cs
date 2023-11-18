@@ -15,31 +15,46 @@ namespace FDS.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly GetUser _getUser;
 
-        public GroupRepository(FDSDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public GroupRepository(GetUser getUser, FDSDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _roleManager = roleManager;
+            _getUser = getUser;
+        }
+
+        public async Task<bool> checkAccountPermission()
+        {
+            var user = await _getUser.user();
+            var adminRole = await _userManager.GetRolesAsync(user);
+            if (adminRole.Any(a => a.ToUpper() == "ADMIN"))
+            {
+                return true;
+            }
+            var listAccountPermission = await _context.AccountPermissions.ToListAsync();
+            if (listAccountPermission.Any(a => a.UsreName == user.UserName))
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<Data.Group> Add(Data.Group g)
         {
-            // lấy jwt mà user cung cấp
-            var authResult = _httpContextAccessor.HttpContext.AuthenticateAsync().Result;
-            var token = authResult.Properties.GetTokenValue("access_token");
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-            // lấy email từ chuỗi jwt sau khi giải mã jwt
-            var _email = jwtToken.Claims.FirstOrDefault().Value;
-
-            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == _email);
+            if (await checkAccountPermission() == false)
+            {
+                return null;
+            }
+            var user = await _getUser.user();
 
             var group = new Data.Group
             {
                 Name = g.Name,
                 CreateDate = DateTime.UtcNow,
+                Note = g.Note,
                 Creator = user.UserName,
                 Members = g.Members
             };
@@ -68,6 +83,10 @@ namespace FDS.Services
 
         public async Task<Data.Group> AddMember(List<string> username, int groupId)
         {
+            if (await checkAccountPermission() == false)
+            {
+                return null;
+            }
             var group = await _context.Groups.Include(a => a.Members).SingleOrDefaultAsync(u => u.Id == groupId);
             if (group == null)
             {
@@ -111,6 +130,10 @@ namespace FDS.Services
 
         public async Task<bool> Delete(int id)
         {
+            if (await checkAccountPermission() == false)
+            {
+                return false;
+            }
             var result = await _context.Groups
                             .Include(a => a.Members)
                             .FirstOrDefaultAsync(f => f.Id == id);
@@ -127,12 +150,20 @@ namespace FDS.Services
 
         public async Task<List<Data.Group>> GetAll()
         {
-            var result = await _context.Groups.ToListAsync();
+            if (await checkAccountPermission() == false)
+            {
+                return null;
+            }
+            var result = await _context.Groups.Include(a => a.Members).ToListAsync();
             return result;
         }
 
         public async Task<Data.Group> GetById(int id)
         {
+            if (await checkAccountPermission() == false)
+            {
+                return null;
+            }
             var result = await _context.Groups
                             .Include(a => a.Members)
                             .FirstOrDefaultAsync(f => f.Id == id);
@@ -142,17 +173,45 @@ namespace FDS.Services
             }
             return result;
         }
-
-        public async Task<bool> Update(Data.Group g, int id)
+        public async Task<bool> DeleteMembers(List<string> listUsername, int groupId)
         {
-            var result = await _context.Groups.SingleOrDefaultAsync(f => f.Id == id);
+            if (await checkAccountPermission() == false)
+            {
+                return false;
+            }
+            var result = await _context.Groups.Include(a => a.Members).SingleOrDefaultAsync(f => f.Id == groupId);
             if (result == null)
             {
                 return false;
             }
-            result.Name = g.Name;
+            // Xác định members cần xóa
+            var membersToRemove = result.Members
+                .Where(member => listUsername.Contains(member.UserName))
+                .ToList();
+            foreach (var memberToRemove in membersToRemove)
+            {
+                result.Members.Remove(memberToRemove);
+            }
+            await _context.SaveChangesAsync();
+
+            return true;
+
+        }
+
+        public async Task<bool> Update(Data.Group g, int id)
+        {
+            if (await checkAccountPermission() == false)
+            {
+                return false;
+            }
+            var result = await _context.Groups.Include(a => a.Members).SingleOrDefaultAsync(f => f.Id == id);
+            if (result == null)
+            {
+                return false;
+            }
+            result.Name = g.Name ?? result.Name;
             result.CreateDate = result.CreateDate;
-            result.Note = g.Note;
+            result.Note = g.Note ?? result.Note;
             result.Creator = result.Creator;
 
             _context.Update(result);

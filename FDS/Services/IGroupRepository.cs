@@ -11,5 +11,6 @@ namespace FDS.Services
         public Task<Group> AddMember(List<string> username, int groupId);
         public Task<bool> Update(Group g, int id);
         public Task<bool> Delete(int id);
+        public Task<bool> DeleteMembers(List<string> listUsername, int groupId);
     }
 }

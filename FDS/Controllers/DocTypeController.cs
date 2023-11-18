@@ -8,6 +8,7 @@ namespace FDS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, GO")]
     public class DocTypeController : ControllerBase
     {
         private readonly IDocTypeRepository _type;
@@ -20,7 +21,6 @@ namespace FDS.Controllers
         }
 
         [HttpPost("addType")]
-        [Authorize]
         public async Task<IActionResult> addType([FromBody] DocType docType)
         {
             if (await _blacklistService.CheckJWT() == true)
@@ -32,7 +32,6 @@ namespace FDS.Controllers
 
         }
         [HttpGet("GetAllType")]
-        [Authorize]
         public async Task<IActionResult> GetAllType()
         {
             if (await _blacklistService.CheckJWT() == true)
@@ -44,7 +43,6 @@ namespace FDS.Controllers
 
         }
         [HttpGet("GetTypeById")]
-        [Authorize]
         public async Task<IActionResult> GetTypeById(int id)
         {
             if (await _blacklistService.CheckJWT() == true)
@@ -56,7 +54,6 @@ namespace FDS.Controllers
 
         }
         [HttpPut("UpdateType")]
-        [Authorize]
         public async Task<IActionResult> UpdateType(DocType docType, int id)
         {
             if (await _blacklistService.CheckJWT() == true)
@@ -68,7 +65,6 @@ namespace FDS.Controllers
 
         }
         [HttpDelete("DeleteType")]
-        [Authorize]
         public async Task<IActionResult> DeleteType(int id)
         {
             if (await _blacklistService.CheckJWT() == true)

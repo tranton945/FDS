@@ -184,9 +184,9 @@ namespace FDS.Services
             var oldGender = accounts.Gender;
 
 
-            accounts.Name = newName;
+            accounts.Name = newName ?? accounts.Name;
             accounts.DateOfBirt = newDateOfBirt;
-            accounts.Gender = newGender;
+            accounts.Gender = newGender ?? accounts.Gender;
 
             var result = await _userManager.UpdateAsync(accounts);
 
@@ -200,9 +200,9 @@ namespace FDS.Services
             else
             {
                 // Khôi phục lại data cũ nếu cập nhật không thành công
-                accounts.Name = newName;
-                accounts.DateOfBirt = newDateOfBirt;
-                accounts.Gender = newGender;
+                accounts.Name = oldName;
+                accounts.DateOfBirt = oldDateOfBirt;
+                accounts.Gender = oldGender;
 
                 return false;
             }

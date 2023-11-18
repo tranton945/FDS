@@ -53,7 +53,7 @@ namespace FDS.Services
         public async Task<List<GroupType>> ListGroupsType()
         {
             var group = await userInGroup();
-            if (group == null)
+            if (group.Count() == 0)
             {
                 return null;
             }

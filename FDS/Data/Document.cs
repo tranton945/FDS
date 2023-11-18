@@ -32,6 +32,7 @@ namespace FDS.Data
         public Flight? Flight { get; set; }
 
         [JsonIgnore]
+        [ForeignKey("DocId")]
         public ICollection<OldDocVer>? OldDocVers { get; set; }
     }
 }

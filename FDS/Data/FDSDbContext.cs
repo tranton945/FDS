@@ -19,6 +19,7 @@ namespace FDS.Data
         public DbSet<UserDTO> UserDTOs { get; set; }
         public DbSet<GroupType> GroupTypes { get; set; }
         public DbSet<DocType> DocTypes { get; set; }
+        public DbSet<AccountPermission> AccountPermissions { get; set; }
         public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
     }

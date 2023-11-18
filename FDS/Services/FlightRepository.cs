@@ -70,10 +70,10 @@ namespace FDS.Services
             {
                 return false;
             }
-            result.FlightNo = flight.FlightNo;
+            result.FlightNo = flight.FlightNo ?? result.FlightNo;
             result.Date = flight.Date;
-            result.PointOfLoading = flight.PointOfLoading;
-            result.PointOfUnLoading = flight.PointOfUnLoading;
+            result.PointOfLoading = flight.PointOfLoading ?? result.PointOfLoading;
+            result.PointOfUnLoading = flight.PointOfUnLoading ?? result.PointOfUnLoading;
             result.DepartureTime = flight.DepartureTime;
             result.ArrivalTime = flight.ArrivalTime;
 
