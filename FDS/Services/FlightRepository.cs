@@ -47,7 +47,7 @@ namespace FDS.Services
 
         public async Task<List<Flight>> GetAll()
         {
-            var result = await _context.Flights.ToListAsync();
+            var result = await _context.Flights.Include(a => a.Documents).ToListAsync();
             return result;
         }
 

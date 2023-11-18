@@ -25,7 +25,7 @@ namespace FDS.Data
         [JsonIgnore]
         public DocType? DocType { get; set; }
 
-        public int? FlightId { get; set; } 
+        public int FlightId { get; set; } 
         [ForeignKey(nameof(FlightId))]
         [InverseProperty("Documents")]
         [JsonIgnore]
