@@ -24,16 +24,16 @@ namespace FDS.Services
 
         private async Task CreateAdminUserAsync()
         {
-            var adminUser = await _userManager.FindByEmailAsync("testsystemadmin123@vietjetair.com");
+            var adminUser = await _userManager.FindByEmailAsync("systemadmin123@vietjetair.com");
             if (adminUser == null)
             {
                 var admin = new ApplicationUser
                 {
-                    Name = "testsystemadmin123",
-                    Email = "testsystemadmin123@vietjetair.com",
+                    Name = "systemadmin123",
+                    Email = "systemadmin123@vietjetair.com",
                     DateOfBirt = DateTime.Now,
                     Gender = "male",
-                    UserName = "testsystemadmin123@vietjetair.com",
+                    UserName = "systemadmin123@vietjetair.com",
                 };
 
                 var createAdminAccount = await _userManager.CreateAsync(admin, "AdminVietjetair@123");
