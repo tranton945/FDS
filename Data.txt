@@ -1,3 +1,6 @@
+admin account
+username: systemadmin123@vietjetair.com
+password: AdminVietjetair@123
 Dạng truyền data
 ===================================== DocType =====================================
 ------------------- method addType -------------------
